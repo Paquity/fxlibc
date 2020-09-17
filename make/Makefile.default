@@ -1,0 +1,168 @@
+#! /usr/bin/make -f
+#---
+#
+#  fxlibc project Makefile
+#
+# This makefile is grandly inspired by the Gint unikernel
+# projet, many thanks to Lephenixnoir !
+# 
+# Build architecture:
+# build/
+#  |-- objects/
+#  |    |-- string_strlen.o
+#  |    |-- string_strcmp.o
+#  |      ...
+#  |    `-- signal_kill.o
+#  |-- debug/
+#  |    |-- fxlibc.map (ELF link map informations)
+#  |      ...
+#  |    `--  otherinfo.txt
+#  |-- Makefile
+#  |-- fxlibc.cfg
+#  `-- bin/
+#       |-- fxlibc_stubs.a (workaround for the shared librairie, see documentation note)
+#       |-- fxlibc.so      (shared librairy)
+#       `-- fxlibc.a       (static librairy)
+#---
+
+#---
+#  Build configuration
+#---
+
+# Require configuration file (if you want to clean up and lost the file, you
+# can either reconfigure or just delete the build directory)
+CONFIG := fxlibc.cfg
+ifeq "$(wildcard $(CONFIG))" ""
+$(error "config file $(CONFIG) does not exist (reconfigure or wipe directory)")
+endif
+include $(CONFIG)
+
+
+# Compiler flags, assembler flags, dependency generation, archiving
+header	:= -I ../include
+cflags	:= $(machine) -ffreestanding -nostdlib -Wall -Wextra -std=c11 -Os \
+		-fstrict-volatile-bitfields $(header) $(CONFIG.CFLAGS)
+
+# color definition
+red	:= \033[1;31m
+green	:= \033[1;32m
+blue	:= \033[1;34m
+white	:= \033[1;37m
+nocolor	:= \033[1;0m
+
+# This is a workaround to force a newline when the "eval" keyword is involved 
+define n
+# Force newline character
+
+endef
+
+# Define all directory used to stored informations
+dir_objects	:= objects
+dir_bin		:= bin
+
+# Output configurations
+name		:= fxlibc
+target		:= $(dir_bin)/$(name).a
+
+# automated variable
+src		:=
+directory	:= $(shell find ../src/ -not -path "*/\.*" -type d)
+$(foreach path,$(directory),$(eval		\
+	src	+= $(wildcard $(path)/*.c)	$n\
+	src	+= $(wildcard $(path)/*.S)	$n\
+	src	+= $(wildcard $(path)/*.s)	$n\
+))
+obj	:= $(patsubst .._src_%,$(dir_objects)/%.o,$(subst /,_,$(basename $(src))))
+
+# check if any file have been found
+ifeq ($(obj),)
+$(error "source file does not exist (reconfigure or wipe directory)")
+endif
+
+
+#---
+# Toolchain
+#---
+gcc	= $(CONFIG.TOOLCHAIN)-gcc
+as	= $(CONFIG.TOOLCHAIN)-as
+ld	= $(CONFIG.TOOLCHAIN)-ld
+ar	= $(CONFIG.TOOLCHAIN)-ar
+objcopy	= $(CONFIG.TOOLCHAIN)-objcopy
+
+
+#---
+#  Version management
+#---
+# TODO
+
+
+#---
+# Build rules
+#---
+all: $(target)
+
+# linker part
+$(target): $(obj) | $(dir_bin)
+	$(ar) crs $@ $^
+
+# Directory management
+$(dir_bin) $(dir_objects):
+	@ printf "Create $(blue)$@$(nocolor) directory\n"
+	@ mkdir -p $@
+
+.PHONY: all
+
+
+#---
+# Automated rules
+#---
+define rule-src
+$(patsubst .._src_%,$(dir_objects)/%.o,$(subst /,_,$(basename $1))): $1 | $(dir_objects)
+	@ printf "compiling $(white)$$<$(nocolor)..."
+	@ $(gcc) $(cflags) -o $$@ -c $$< -lgcc
+	@ printf "$(green)[ok]$(nocolor)\n"
+endef
+
+$(foreach source,$(src),$(eval		\
+	$(call rule-src,$(source)))	\
+)
+
+
+#---
+# Debugging rules
+#---
+help:
+	@ echo 'make [options]...'
+	@ echo ''
+	@ echo 'Options:'
+	@ echo '  * disasm  use objdump to display the content of the archive'
+	@ echo '  * debug   display source files name and objects name'
+	@ echo '  * elf_sec display ELF section of the archive'
+__debug:
+	@ echo 'src: $(src)'
+	@ echo ''
+	@ echo 'obj: $(obj)'
+	@ echo ''
+	@ echo 'directory: $(dir_bin) $(dir_output) $(dir_objects)'
+
+disasm:
+	@ $(objdump) -D $(target) | less
+
+elf_sec:
+	@ $(objdump) -h $(target) | less
+
+.PHONY: help __debug disasm elf_sec
+
+
+#---
+# clean rules
+#---
+clean:
+	rm -rf $(dir_objects)
+
+fclean: clean
+	rm -rf $(dir_bin)
+
+re: fclean clean
+
+.PHONY: clean fclean re

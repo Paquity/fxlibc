@@ -1,0 +1,178 @@
+#! /bin/bash
+
+# output file
+confile='fxlibc.cfg'
+
+# Build options
+toolchain=sh-elf
+prefix=
+cflags=
+
+# wanted Makefile
+makefile='Makefile.default'
+
+# configuration
+declare -A config
+config[__SUPPORT_VHEX_KERNEL]=false
+config[__DEBUG]=false
+config[__ENABLE_VALGRIND]=false
+config[__SUPPORT_CASIO_ABI_FX9860]=false
+config[__SUPPORT_CASIO_ABI_FXCG50]=false
+
+#
+# Help screen
+#
+help()
+{
+cat << EOF
+Configuration script for the fx calculator libc.
+Usage: $0 [OPTION]...
+
+You should build out-of-tree by creating a build directory and configuring from
+there.
+
+Debug the fxlibc
+  --debug        enable valgrind flags (-g3)
+  --unit-test    check C-functoon validity with Criterion
+
+Build options:
+  --toolchain=TRIPLET    Build with a different toolchain
+                         [sh-elf-gcc] (or [gcc] when the '--unit_test' flag is set)
+  --cflags=FLAGS         Additional compiler flags at end of command
+
+ABI support:
+  --vhex-support                 Enable the Vhex kernel support
+  --casio-support=fx9860|fxcg50
+    enable the support of the Casio' ABI (used by malloc, free, ...)
+      
+    fx9860 covers all fx-9860G II-like monochromes models that support add-ins
+    or can be flashed with an OS that does. This includes SH3 and SH4 machines.
+
+    fxcg50 covers just the fx-CG 50; there is some unofficial compatibility with
+    fx-CG 10/20. All of these are SH4-only.
+
+The 'ABI support' is used to allow some part of the code, in particular the 'unistd'
+part, I/O management and additionnal feature (process, fs, ...).
+
+Format:
+    --dyn-lib   generate dynamic librairies (Vhex kernel dependant)
+
+Little note for the generation of dynamic libraries.
+The superH toolchain currently used (GCC) does not support the '--shared' flags
+when the archive is build. So we need to create manually an archive that can be
+used like a shared librairy.
+
+To do this we need to do several steps:
+1) build the sources with the PIE mode as if it were a executable without entry point.
+2) manually extract symbols defined as 'global' from the generated ELF.
+3) we create "stubs": functions that will have the same name than the wanted
+     shared librairies and will call internal VHEX loader primitives with the
+     librairies name, function address and size, etc....Then the loader will
+     load the shared function and override the "user function (stub)" to force
+     it to jump into the "real" function (trampoline)
+4) all generated stubs will be compiled and linked throught a static lib that
+     SHOULD be used in the user program which use the "dynamic librairy"
+
+EOF
+  exit 0
+}
+
+
+#
+# Check mandatory build location
+# @note:
+# * You should build out-of-tree by creating a build directory and configuring
+#   from there.
+#
+if [ -f 'make/Makefile.default' ]; then
+  echo "error: you should configure from a build directory, like this:" >&2
+  echo "  mkdir build && cd build && ../configure [options..]" >&2
+  exit 1
+fi
+
+
+#
+# Parsing arguments
+#
+for arg; do case "$arg" in
+  --help | -h) 
+    help;;
+
+  --debug)
+    config[__DEBUG]=true;;
+  --unit-test)
+    makefile='Malefile.unitest';;
+
+  
+  --toolchain=*)
+    toolchain=${arg#*=};;
+  --prefix=*)
+    prefix=${arg#*=};;
+  --cflags=*)
+    cflags=${arg#*=};;
+
+  --vhex-support)
+    config[__SUPPORT_VHEX_KERNEL]=true;;
+  --casio-abi=*)
+    case ${arg#*=} in
+      "fx9860g")
+        config[__SUPPORT_CASIO_ABI_FX9860]=true;;
+      "fcg50")
+        config[__SUPPORT_CASIO_ABI_FXCG50]=true;;
+      *)
+        echo -e "\033[1;33merror\033[0m unreconized target '$arg'"
+        exit 1
+    esac;;
+
+  --dyn-lib)
+    makefile='Makefile.dynlib';;
+  *)
+    echo -e "\033[1;33merror\033[0m unreconized argument '$arg'"
+    exit 1
+esac; done
+
+
+#
+# Check error
+#
+if [ ${config[__SUPPORT_CASIO_ABI_FX9860]} = true ] && [ ${config[__SUPPORT_CASIO_ABI_FXCG50]} = true ]; then
+  echo -e "\033[1;33merror\033[0m too many target"
+  exit 1
+fi
+
+
+#
+# Dump appropriate Makefile
+# @note:
+# * We have 3 makefile: normal, dynlib, unit_test
+#
+dst='Makefile'
+src="../make/$makefile"
+if ! test $src; then
+  echo -e "\033[1;33merror\033[0m target makefile ($src) does not exist !"
+  exit 1
+fi
+[ -L $src ] && [ "$(readlink $src)" == $dst ] && rm $dst
+ln -s $src $dst
+
+
+#
+# Generate the configuration file
+#
+function generate_config()
+{
+  echo "CONFIG.TOOLCHAIN = $toolchain"
+  [ "$prefix" ] && echo "PREFIX = $prefix"
+  [ "$cflags" ] && echo "CONFIG.CFLAGS = $cflags"
+
+  [ ${config[__DEBUG]} = true ] && echo -n '-g3'
+  [ ${config[__SUPPORT_VHEX_KERNEL]} = true ] && echo -n ' -D __SUPPORT_VHEX_KERNEL'
+  [ ${config[__SUPPORT_CASIO_ABI_FX9860]} = true ] && echo -n ' -D ___SUPPORT_CASIO_ABI_FX9860'
+  [ ${config[__SUPPORT_CASIO_ABI_FXCG50]} = true ] && echo -n ' -D ___SUPPORT_CASIO_ABI_FXCG50'
+  echo ''
+}
+generate_config > $confile
+
+
+echo "Configuration saved in $confile, ready to make!"
+exit 0
