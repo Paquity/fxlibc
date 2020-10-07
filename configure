@@ -1,4 +1,9 @@
 #! /bin/bash
+#
+# -= TODO =-
+# * check if the wanted lib exist (check lib verion too)!
+# * option to list all installed libraries with their versions
+# * each ABI options define one specific libs (fxlibc-common, fxlibc-vhex, fxlibc-fx9860g, fxlibc-fxcg50)
 
 # output file
 confile='fxlibc.cfg'
@@ -13,38 +18,41 @@ makefile='Makefile.default'
 
 # configuration
 declare -A config
-config[__SUPPORT_VHEX_KERNEL]=false
 config[__DEBUG]=false
 config[__ENABLE_VALGRIND]=false
-config[__SUPPORT_CASIO_ABI_FX9860]=false
-config[__SUPPORT_CASIO_ABI_FXCG50]=false
+config[__SUPPORT_VHEX_KERNEL]=false
+config[__SUPPORT_CASIO_FX9860]=false
+config[__SUPPORT_CASIO_FXCG50]=false
 
-#
+#---
 # Help screen
-#
+#---
 help()
 {
 cat << EOF
-Configuration script for the fx calculator libc.
+Configuration script for the fx calculator standard C library.
 Usage: $0 [OPTION]...
 
 You should build out-of-tree by creating a build directory and configuring from
 there.
 
 Debug the fxlibc
-  --debug        enable valgrind flags (-g3)
-  --unit-test    check C-functoon validity with Criterion
+  --debug        Enable valgrind flags (-g3)
+  --unit-test    Check C-functoon validity with Criterion
 
 Build options:
-  --toolchain=TRIPLET    Build with a different toolchain
-                         [sh-elf-gcc] (or [gcc] when the '--unit_test' flag is set)
-  --cflags=FLAGS         Additional compiler flags at end of command
+  --toolchain=TRIPLET  Build with a different toolchain
+                       [sh-elf-gcc] (or [gcc] when the '--unit_test' flag is set)
+  --cflags=FLAGS       Additional compiler flags at end of command
+  --prefix=PREFIX      Install prefix (PREFIX/lib and PREFIX/include are used)
 
 ABI support:
-  --vhex-support                 Enable the Vhex kernel support
-  --casio-support=fx9860|fxcg50
-    enable the support of the Casio' ABI (used by malloc, free, ...)
-      
+  --support-vhex
+    Enable the Vhex kernel support
+  --support-casio-fx9860,
+  --support-casio-fxcg50
+    Enable the support of the Casio' ABI (used by malloc, free, ...)
+
     fx9860 covers all fx-9860G II-like monochromes models that support add-ins
     or can be flashed with an OS that does. This includes SH3 and SH4 machines.
 
@@ -52,27 +60,25 @@ ABI support:
     fx-CG 10/20. All of these are SH4-only.
 
 The 'ABI support' is used to allow some part of the code, in particular the 'unistd'
-part, I/O management and additionnal feature (process, fs, ...).
+part, I/O management and additionals feature. (like process, fs, ...).
 
 Format:
-    --dyn-lib   generate dynamic librairies (Vhex kernel dependant)
+    --dyn-lib   Generate dynamic librairies (Vhex kernel dependant)
 
-Little note for the generation of dynamic libraries.
-The superH toolchain currently used (GCC) does not support the '--shared' flags
-when the archive is build. So we need to create manually an archive that can be
-used like a shared librairy.
+Little note for the generation of dynamic libraries. The superH toolchain currently
+used (GCC) does not support the '--shared' flags when the archive is build. So we
+need to create manually an archive that can be used like a shared library.
 
 To do this we need to do several steps:
 1) build the sources with the PIE mode as if it were a executable without entry point.
 2) manually extract symbols defined as 'global' from the generated ELF.
-3) we create "stubs": functions that will have the same name than the wanted
-     shared librairies and will call internal VHEX loader primitives with the
-     librairies name, function address and size, etc....Then the loader will
-     load the shared function and override the "user function (stub)" to force
-     it to jump into the "real" function (trampoline)
-4) all generated stubs will be compiled and linked throught a static lib that
-     SHOULD be used in the user program which use the "dynamic librairy"
-
+3) we create "stubs": functions that will have the same name than the wanted shared
+     libraries and will call internal VHEX loader primitives with the libraries
+     name, function address and size, etc....Then the loader will load the shared
+     function and override the "user function (stub)" to force it to jump into
+     the "real" function (trampoline).
+4) all generated stubs will be compiled and linked through a static lib that SHOULD
+     be used in the user program which uses the "dynamic library"
 EOF
   exit 0
 }
@@ -85,8 +91,8 @@ EOF
 #   from there.
 #
 if [ -f 'make/Makefile.default' ]; then
-  echo "error: you should configure from a build directory, like this:" >&2
-  echo "  mkdir build && cd build && ../configure [options..]" >&2
+  echo 'error: you should configure from a build directory, like this:' >&2
+  echo '  mkdir build && cd build && ../configure [options..]' >&2
   exit 1
 fi
 
@@ -95,15 +101,16 @@ fi
 # Parsing arguments
 #
 for arg; do case "$arg" in
-  --help | -h) 
+  --help | -h)
     help;;
 
+  # debug options
   --debug)
     config[__DEBUG]=true;;
   --unit-test)
     makefile='Malefile.unitest';;
 
-  
+  # build options
   --toolchain=*)
     toolchain=${arg#*=};;
   --prefix=*)
@@ -111,68 +118,93 @@ for arg; do case "$arg" in
   --cflags=*)
     cflags=${arg#*=};;
 
-  --vhex-support)
+  # ABI support
+  --support-vhex)
     config[__SUPPORT_VHEX_KERNEL]=true;;
-  --casio-abi=*)
-    case ${arg#*=} in
-      "fx9860g")
-        config[__SUPPORT_CASIO_ABI_FX9860]=true;;
-      "fcg50")
-        config[__SUPPORT_CASIO_ABI_FXCG50]=true;;
-      *)
-        echo -e "\033[1;33merror\033[0m unreconized target '$arg'"
-        exit 1
-    esac;;
+  --support-casio-abi-fx9860)
+    config[__SUPPORT_CASIO_ABI_FX9860]=true;;
+  --support-casio-abi-fxcg50)
+    config[__SUPPORT_CASIO_ABI_FXCG50]=true;;
 
+  # format options
   --dyn-lib)
     makefile='Makefile.dynlib';;
+
+  # error part
   *)
-    echo -e "\033[1;33merror\033[0m unreconized argument '$arg'"
+    echo "error: unreconized argument '$arg', giving up." >&2
     exit 1
 esac; done
 
 
-#
+#---
 # Check error
-#
-if [ ${config[__SUPPORT_CASIO_ABI_FX9860]} = true ] && [ ${config[__SUPPORT_CASIO_ABI_FXCG50]} = true ]; then
-  echo -e "\033[1;33merror\033[0m too many target"
+#---
+# Check ABI support error
+if [ ${config[__SUPPORT_CASIO_ABI_FX9860]} = true ] && [ ${config[__SUPPORT_CASIO_ABI_FXCG50]} = true ] ||
+    [ ${config[__SUPPORT_VHEX_KERNEL]} = true ] && [ ${config[__SUPPORT_CASIO_ABI_FXCG50]} = true ] ||
+    [ ${config[__SUPPORT_VHEX_KERNEL]} = true ] && [ ${config[__SUPPORT_CASIO_ABI_FX9860]} = true ]; then
+  echo "error: too many ABI target" >&2
   exit 1
+fi
+
+# If no prefix is specified, install to the GCC's build folder
+if [[ -z "$prefix" ]]
+then
+  # ask the toolchain where is his installation path
+  echo "No prefix specified, let's ask the compiler:"
+  echo "  Call: \"$toolchain-gcc --print-search-dirs | grep install | sed 's/install: //'\""
+  if ! inst=$("$toolchain"-gcc --print-search-dirs | grep install | sed 's/install: //'); then
+    echo "  Call: returned $?, giving up." >&2
+    exit 1
+  fi
+  echo "  Got '$inst'".
+
+  # check if the directory exist
+  if [[ ! -d $inst ]]; then
+    echo "Directory does not exist (or is not a directory), giving up." >&2
+    exit 1
+  fi
+  prefix=$inst
 fi
 
 
 #
+# TODO: check if the wanted lib exist (check lib verion too)!
+#
+
+#---
 # Dump appropriate Makefile
 # @note:
 # * We have 3 makefile: normal, dynlib, unit_test
-#
+#---
 dst='Makefile'
 src="../make/$makefile"
 if ! test $src; then
-  echo -e "\033[1;33merror\033[0m target makefile ($src) does not exist !"
+  echo "error: target makefile ($src) does not exist !" >&2
   exit 1
 fi
-[ -L $src ] && [ "$(readlink $src)" == $dst ] && rm $dst
+[ $dst ] && [ "$(readlink $dst)" == $src ] && rm $dst
 ln -s $src $dst
 
 
-#
+#---
 # Generate the configuration file
-#
-function generate_config()
+#---
+generate_config()
 {
-  echo "CONFIG.TOOLCHAIN = $toolchain"
-  [ "$prefix" ] && echo "PREFIX = $prefix"
-  [ "$cflags" ] && echo "CONFIG.CFLAGS = $cflags"
+  echo "CONFIG.CFLAGS := "
+  echo "CONFIG.TARGET := "
+  echo "CONFIG.TOOLCHAIN := $toolchain"
+  [ "$prefix" ] && echo "CONFIG.PREFIX := $prefix"
+  [ "$cflags" ] && echo "CONFIG.CFLAGS += $cflags"
 
-  [ ${config[__DEBUG]} = true ] && echo -n '-g3'
-  [ ${config[__SUPPORT_VHEX_KERNEL]} = true ] && echo -n ' -D __SUPPORT_VHEX_KERNEL'
-  [ ${config[__SUPPORT_CASIO_ABI_FX9860]} = true ] && echo -n ' -D ___SUPPORT_CASIO_ABI_FX9860'
-  [ ${config[__SUPPORT_CASIO_ABI_FXCG50]} = true ] && echo -n ' -D ___SUPPORT_CASIO_ABI_FXCG50'
-  echo ''
+  #[ ${config[__DEBUG]} = true ] && echo "CONFIG.CFLAGS += -g3"
+  [ ${config[__SUPPORT_VHEX_KERNEL]} = true ] && echo "CONFIG.TARGET += fxlibc-vhex"
+  [ ${config[__SUPPORT_CASIO_ABI_FX9860]} = true ] && echo "CONFIG.TARGET += fxlibc-fx9860"
+  [ ${config[__SUPPORT_CASIO_ABI_FXCG50]} = true ] && echo "CONFIG.TARGET += fxlibc-fxcg50"
 }
 generate_config > $confile
-
 
 echo "Configuration saved in $confile, ready to make!"
 exit 0
