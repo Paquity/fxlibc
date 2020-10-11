@@ -17,12 +17,17 @@ cflags=
 makefile='Makefile.default'
 
 # configuration
-declare -A config
-config[__DEBUG]=false
-config[__ENABLE_VALGRIND]=false
-config[__SUPPORT_VHEX_KERNEL]=false
-config[__SUPPORT_CASIO_FX9860]=false
-config[__SUPPORT_CASIO_FXCG50]=false
+debug=false
+valgrind=false
+
+# ABI support
+support_vhex_kernel=false
+support_casio_abi_fx9860=false
+support_casio_abi_fxcg50=false
+
+# format
+format_static=false
+format_dynamic=false
 
 #---
 # Help screen
@@ -63,7 +68,8 @@ The 'ABI support' is used to allow some part of the code, in particular the 'uni
 part, I/O management and additionals feature. (like process, fs, ...).
 
 Format:
-    --dyn-lib   Generate dynamic librairies (Vhex kernel dependant)
+    --static    Generate static libraries (default)
+    --dynamic   Generate dynamic libraries (Vhex kernel dependant)
 
 Little note for the generation of dynamic libraries. The superH toolchain currently
 used (GCC) does not support the '--shared' flags when the archive is build. So we
@@ -84,12 +90,12 @@ EOF
 }
 
 
-#
+#---
 # Check mandatory build location
 # @note:
 # * You should build out-of-tree by creating a build directory and configuring
 #   from there.
-#
+#---
 if [ -f 'make/Makefile.default' ]; then
   echo 'error: you should configure from a build directory, like this:' >&2
   echo '  mkdir build && cd build && ../configure [options..]' >&2
@@ -97,16 +103,16 @@ if [ -f 'make/Makefile.default' ]; then
 fi
 
 
-#
+#---
 # Parsing arguments
-#
+#---
 for arg; do case "$arg" in
   --help | -h)
     help;;
 
   # debug options
   --debug)
-    config[__DEBUG]=true;;
+    debug=true;;
   --unit-test)
     makefile='Malefile.unitest';;
 
@@ -120,15 +126,17 @@ for arg; do case "$arg" in
 
   # ABI support
   --support-vhex)
-    config[__SUPPORT_VHEX_KERNEL]=true;;
+    support_vhex_kernel=true;;
   --support-casio-abi-fx9860)
-    config[__SUPPORT_CASIO_ABI_FX9860]=true;;
+    support_casio_abi_fx9860=true;;
   --support-casio-abi-fxcg50)
-    config[__SUPPORT_CASIO_ABI_FXCG50]=true;;
+    support_casio_abi_fxcg50=true;;
 
   # format options
-  --dyn-lib)
-    makefile='Makefile.dynlib';;
+  --static)
+    format_static=true;;
+  --dynamic)
+    format_dynamic=true;;
 
   # error part
   *)
@@ -140,14 +148,6 @@ esac; done
 #---
 # Check error
 #---
-# Check ABI support error
-if [ ${config[__SUPPORT_CASIO_ABI_FX9860]} = true ] && [ ${config[__SUPPORT_CASIO_ABI_FXCG50]} = true ] ||
-    [ ${config[__SUPPORT_VHEX_KERNEL]} = true ] && [ ${config[__SUPPORT_CASIO_ABI_FXCG50]} = true ] ||
-    [ ${config[__SUPPORT_VHEX_KERNEL]} = true ] && [ ${config[__SUPPORT_CASIO_ABI_FX9860]} = true ]; then
-  echo "error: too many ABI target" >&2
-  exit 1
-fi
-
 # If no prefix is specified, install to the GCC's build folder
 if [[ -z "$prefix" ]]
 then
@@ -169,9 +169,9 @@ then
 fi
 
 
-#
+# TODO
 # TODO: check if the wanted lib exist (check lib verion too)!
-#
+# TODO
 
 #---
 # Dump appropriate Makefile
@@ -193,16 +193,24 @@ ln -s $src $dst
 #---
 generate_config()
 {
-  echo "CONFIG.CFLAGS := "
-  echo "CONFIG.TARGET := "
+  echo 'CONFIG.CFLAGS := '
+  echo 'CONFIG.TARGET := '
+  echo 'CONFIG.FORMAT := '
   echo "CONFIG.TOOLCHAIN := $toolchain"
   [ "$prefix" ] && echo "CONFIG.PREFIX := $prefix"
   [ "$cflags" ] && echo "CONFIG.CFLAGS += $cflags"
 
-  #[ ${config[__DEBUG]} = true ] && echo "CONFIG.CFLAGS += -g3"
-  [ ${config[__SUPPORT_VHEX_KERNEL]} = true ] && echo "CONFIG.TARGET += fxlibc-vhex"
-  [ ${config[__SUPPORT_CASIO_ABI_FX9860]} = true ] && echo "CONFIG.TARGET += fxlibc-fx9860"
-  [ ${config[__SUPPORT_CASIO_ABI_FXCG50]} = true ] && echo "CONFIG.TARGET += fxlibc-fxcg50"
+  # debug / unit tests
+  [ $debug = true ] && echo 'CONFIG.CFLAGS += -g3'
+
+  # ABI support
+  [ $support_vhex_kernel = true ] && echo 'CONFIG.TARGET += fxlibc-vhex'
+  [ $support_casio_abi_fx9860 = true ] && echo 'CONFIG.TARGET += fxlibc-fx9860'
+  [ $support_casio_abi_fxcg50 = true ] && echo 'CONFIG.TARGET += fxlibc-fxcg50'
+
+  # formats
+  [ $format_static = true ] && echo 'CONFIG.FORMAT += static'
+  [ $format_dynamic = true ] && echo 'CONFIG.FORMAT += dynamic'
 }
 generate_config > $confile
 
