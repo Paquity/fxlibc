@@ -34,7 +34,7 @@
 #---
 MAJOR	:= 0
 MINOR	:= 2
-PATCH	:= 1
+PATCH	:= 2
 EXTRAVERSION	:= -alpha
 
 
@@ -120,13 +120,13 @@ first: all
 # @params:
 # *1 - source file path
 # *2 - build directory path (output)
+# *3 - build flags
 # TODO:
-# * handle custom cflags (format, abi management)
 # * handle verbose option
 define compile-src
 $(patsubst .._src_%,$2%.o,$(subst /,_,$(basename $1))): $1 | $2/
 	@ printf "$(green)>$(nocolor) $(white)$$@$(nocolor)\n"
-	@ $(gcc) $(cflags) -o $$@ -c $$< -lgcc
+	@ $(gcc) $3 -o $$@ -c $$< -lgcc
 endef
 
 # common part used by all library geneation
@@ -160,7 +160,7 @@ endif
 
 # generate all file object name
 $$(foreach source,$3,$$(eval \
-	$$(call compile-src,$$(source),$$(lib-build-dir)) \
+	$$(call compile-src,$$(source),$$(lib-build-dir),$$(lib-cflags)) \
 ))
 
 # link the library
@@ -206,7 +206,7 @@ all: $(generated-libs)
 version:
 	@ echo "$(lib-version)"
 
-DEBUG=$(call generate-target,fxlibc,static,$(dir_objects),$(src))
+DEBUG=$(call generate-target,fxlibc-vhex,static,$(dir_objects),$(src))
 export DEBUG
 debug:
 	@ echo "$$DEBUG"
@@ -222,5 +222,5 @@ clean:
 	rm -rf $(dir_object)
 fclean: clean
 	rm -rf $(dir_output)
-re: fclean clean
+re: fclean all
 .PHONY: clean fclean re

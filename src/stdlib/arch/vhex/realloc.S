@@ -20,7 +20,7 @@ _realloc:
 	tst 	r4, r4
 	bf	check_free
 	mov 	r5, r4
-	trapa	#__NR_proc_head_alloc
+	trapa	#__NR_proc_heap_alloc
 	rts
 	nop
 
