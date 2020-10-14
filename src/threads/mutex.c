@@ -25,8 +25,7 @@ int mtx_lock(mtx_t *__mutex)
 		return (-1);
 
 	// Wait util the mutex is unlocked
-	while (1)
-	{
+	while (1) {
 		// Check if the mutex is unlock
 		__thread_atomic_start();
 		if (__mutex->lock == 0)
@@ -62,8 +61,7 @@ int mtx_trylock(mtx_t *__mutex)
 
 	// Check if the mutex is already free
 	int ret = -1;
-	if (__mutex->lock == 0)
-	{
+	if (__mutex->lock == 0) {
 		//TODO: handle mutex type !!
 		(void)__mutex->type;
 

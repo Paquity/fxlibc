@@ -34,8 +34,8 @@
 #---
 MAJOR	:= 0
 MINOR	:= 2
-PATCH	:= 3
-EXTRAVERSION	:= -alpha
+PATCH	:= 4
+EXTRAVERSION	:= -beta
 
 
 #---

@@ -18,6 +18,12 @@ static void disp_fflush(struct printf_opt *opt)
 	opt->str[opt->buffer_cursor] = '\0';
 }
 
+/*
+** The functions vsnprintf() are equivalent to the snprintf() except that  they
+** are called with a va_list instead of a variable number of arguments. These
+** functions do not call the va_end macro. Because they invoke the va_arg macro,
+** the value of ap is undefined after the call.
+*/
 int vsnprintf(char *restrict str, size_t size, const char *restrict format, va_list ap)
 {
 	extern int printf_common(struct printf_opt *opt, const char *restrict format);
@@ -30,4 +36,3 @@ int vsnprintf(char *restrict str, size_t size, const char *restrict format, va_l
 	va_copy(opt.ap, ap);
 	return (printf_common(&opt, format) + 1);
 }
-

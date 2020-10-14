@@ -26,6 +26,12 @@ static void disp_char(struct printf_opt *opt, char n)
 	opt->buffer[opt->buffer_cursor++] = n;
 }
 
+/*
+** The functions vdprintf() are equivalent to the dprintf() except that  they
+** are called with a va_list instead of a variable number of arguments. These
+** functions do not call the va_end macro. Because they invoke the va_arg macro,
+** the value of ap is undefined after the call.
+*/
 int vdprintf(int fd, const char *restrict format, va_list ap)
 {
 	extern int printf_common(struct printf_opt *opt, const char *restrict format);

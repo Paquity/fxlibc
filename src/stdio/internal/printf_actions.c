@@ -31,8 +31,7 @@ static void base_to_str(struct printf_opt *opt, uint32_t num, int base, int digi
 	char *hexa = (opt->uppercase == 1) ? "0123456789ABCDEF" : "0123456789abcdef";
 
 	opt->digits = 0;
-	while (num != 0 || opt->digits < digits)
-	{
+	while (num != 0 || opt->digits < digits) {
 		opt->format[opt->digits++] = hexa[num % base];
 		num = num / base;
 	}
@@ -49,8 +48,7 @@ static void disp_format(struct printf_opt *opt)
 		(*opt->disp_char)(opt, opt->base[1]);
 
 	// padding
-	if (opt->flags.minus == 1 && opt->width > opt->digits)
-	{
+	if (opt->flags.minus == 1 && opt->width > opt->digits) {
 		int total = opt->digits + (opt->sign != '\0') +
 			(opt->base[0] != '\0') + (opt->base[1] != '\0');
 		total = opt->width - total;
@@ -65,8 +63,7 @@ static void disp_format(struct printf_opt *opt)
 		(*opt->disp_char)(opt, opt->format[opt->digits]);
 
 	// padding
-	if (opt->flags.minus == 0 && opt->width > saved_digits)
-	{
+	if (opt->flags.minus == 0 && opt->width > saved_digits) {
 		int total = saved_digits + (opt->sign != '\0') +
 			(opt->base[0] != '\0') + (opt->base[1] != '\0');
 		total = opt->width - total;
@@ -81,8 +78,7 @@ static void disp_format(struct printf_opt *opt)
 //---
 static uint32_t get_arg_i(struct printf_opt *opt)
 {
-	switch (opt->lenght)
-	{
+	switch (opt->lenght) {
 	case 0: return ((signed char)va_arg(opt->ap, int));
 	case 1: return ((short int)va_arg(opt->ap, int));
 	case 2: return (va_arg(opt->ap, long int));
@@ -96,8 +92,7 @@ static uint32_t get_arg_i(struct printf_opt *opt)
 
 static uint32_t get_arg_u(struct printf_opt *opt)
 {
-	switch (opt->lenght)
-	{
+	switch (opt->lenght) {
 	case 0: return ((unsigned char)va_arg(opt->ap, int));
 	case 1: return ((unsigned short int)va_arg(opt->ap, int));
 	case 2: return (va_arg(opt->ap, unsigned long int));
@@ -165,8 +160,7 @@ static void action_uint(struct printf_opt *opt, char n)
 	int base;
 
 	// Get appropriate base
-	switch (n)
-	{
+	switch (n) {
 	case 'o': base = 8; break;
 	case 'x': base = 16; break;
 	default:  base = 10; break;
