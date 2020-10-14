@@ -16,7 +16,7 @@ int mtx_init (mtx_t *__mutex, int __type)
 	return (0);
 }
 
-// Block the current thread until the mutex pointed to by __MUTEX is unlocked. 
+// Block the current thread until the mutex pointed to by __MUTEX is unlocked.
 // In that case current thread will not be blocked.
 int mtx_lock(mtx_t *__mutex)
 {
@@ -56,7 +56,7 @@ int mtx_trylock(mtx_t *__mutex)
 	// Check mutex validity
 	if (__mutex->__watermark != MTX_WATERMARK)
 		return (-1);
-	
+
 	// Start atomic operations
 	__thread_atomic_start();
 

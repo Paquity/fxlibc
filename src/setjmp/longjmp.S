@@ -6,7 +6,8 @@
 .align 2
 /*
 ** void longjmp(jmp_buf env, int val)
-** @note: TODO
+** Store the calling environment in ENV, not saving the signal mask.
+** Return 0.
 */
 _longjmp:
 	! save the context into unbankable register

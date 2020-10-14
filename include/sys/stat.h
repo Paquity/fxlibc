@@ -19,7 +19,6 @@
 #define	__S_IWRITE	0000200	/* Write by owner.  */
 #define	__S_IEXEC	0000100	/* Execute by owner.  */
 
-
 #define	S_IRUSR	__S_IREAD	/* Read by owner.  */
 #define	S_IWUSR	__S_IWRITE	/* Write by owner.  */
 #define	S_IXUSR	__S_IEXEC	/* Execute by owner.  */

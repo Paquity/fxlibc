@@ -5,7 +5,10 @@
 .align 2
 /*
 ** int setjmp(jmp_buf env)
-** @note: TODO
+** Store the calling environment in ENV, also saving the signal mask.
+** Return 0.
+**
+** TODO: hande signal mask
 */
 _setjmp:
 	! block interrupt
@@ -40,4 +43,4 @@ _setjmp:
 	! return
 	rts
 	mov	#0, r0
-
+.end

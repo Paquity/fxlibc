@@ -1,12 +1,18 @@
-#ifndef __LIB_SYS_SYSCALL_H__
-# define __LIB_SYS_SYSCALL_H__
+#ifndef __SYSCALL_H__
+# define __SYSCALL_H__
 
-#include <stddef.h>
-#include <stdint.h>
+/*
+** This file should list the numbers of the system calls the system knows.
+** But instead of duplicating this we use the information available
+** from the kernel sources.
+*/
+#include <asm/unistd.h>
 
-// include Vhex kernel real syscall
-#include <asm/unistd_32.h>
+/*
+** The Linux kernel header file defines macros __NR_*, but some
+** programs expect the traditional form SYS_*.  <bits/syscall.h>
+** defines SYS_* macros for __NR_* macros of known names.
+*/
+#include <bits/syscall.h>
 
-//TODO include Casio's syscall !! 
-
-#endif /*__LIB_SYS_SYSCALL_H__*/
+#endif

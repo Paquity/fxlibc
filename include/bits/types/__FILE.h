@@ -1,7 +1,8 @@
-#ifndef __LIB_BITS_TYPES___FILE_H__
-# define __LIB_BITS_TYPES___FILE_H__
+#ifndef __BITS_TYPES__FILE_H__
+# define ___LIB_BITS_TYPES__FILE_H__
 
+// define opaque definition of the FILE type
 struct _IO_FILE;
 typedef struct _IO_FILE __FILE;
 
-#endif /*__LIB_BITS_TYPES___FILE_H__*/
+#endif /*__BITS_TYPES__FILE_H__*/

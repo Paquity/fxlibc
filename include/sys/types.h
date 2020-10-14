@@ -17,6 +17,7 @@ typedef int32_t ssize_t;
 #endif
 
 // Define alias
+//FIXME: potential conflict with the real glibc(?)
 typedef int32_t pid_t;
 typedef int16_t mode_t;
 typedef uint16_t dev_t;
