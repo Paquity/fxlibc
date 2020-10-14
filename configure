@@ -205,7 +205,7 @@ generate_config()
 
   # ABI support
   [ $support_vhex_kernel = true ] && echo 'CONFIG.TARGET += fxlibc-vhex'
-  [ $support_casio_abi_fx9860 = true ] && echo 'CONFIG.TARGET += fxlibc-fx9860'
+  [ $support_casio_abi_fx9860 = true ] && echo 'CONFIG.TARGET += fxlibc-fx9860g'
   [ $support_casio_abi_fxcg50 = true ] && echo 'CONFIG.TARGET += fxlibc-fxcg50'
 
   # formats

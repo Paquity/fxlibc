@@ -13,7 +13,7 @@
 ** and may be reused.
 */
 _close:
-	casio_trapa(__NR_close)
+	casio_trapa(__NR_Bfile_CloseFile)
 	rts
 	nop
 .end

@@ -34,7 +34,7 @@
 #---
 MAJOR	:= 0
 MINOR	:= 2
-PATCH	:= 2
+PATCH	:= 3
 EXTRAVERSION	:= -alpha
 
 
@@ -152,7 +152,7 @@ generated-libs += $$(lib-name)
 # add custom flags based on the target ABI
 ifeq ($1,fxlibc-vhex)
 lib-cflags	+= -D __SUPPORT_VHEX_KERNEL
-else ifeq ($1,fxlibc-casio-abi-fx9860)
+else ifeq ($1,fxlibc-casio-abi-fx9860g)
 lib-cflags	+= -D __SUPPORT_CASIO_ABI_FX9860G
 else ifeq ($1,fxlibc-casio-abi-fxcf50)
 lib-cflags	+= -D __SUPPORT_CASIO_ABI_FXCG50
