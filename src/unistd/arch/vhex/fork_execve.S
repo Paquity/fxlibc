@@ -1,4 +1,4 @@
-#include __SUPPORT_VHEX_KERNEL
+#ifdef __SUPPORT_VHEX_KERNEL
 #include <asm/unistd_32.h>
 .text
 .global	_fork_execve

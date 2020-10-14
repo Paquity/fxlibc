@@ -73,7 +73,7 @@ extern ssize_t pwrite (int __fd, const void *__buf, size_t __n, off_t __offset);
 ** or the end of the file (if WHENCE is SEEK_END).
 ** Return the new file position.
 */
-extern __off_t lseek (int __fd, off_t __offset, int __whence);
+extern off_t lseek (int __fd, off_t __offset, int __whence);
 
 /* Close the file descriptor FD */
 extern int close(int __fd);

@@ -1,5 +1,5 @@
-#ifndef _SRC_STDIO_PRINTF_H__
-# define _SRC_STDIO_PRINTF_H__
+#ifndef _SRC_STDIO_INTERNAL_PRINTF_H__
+# define _SRC_STDIO_INTERNAL_PRINTF_H__
 
 #include <stddef.h>
 #include <stdint.h>
@@ -55,4 +55,4 @@ struct printf_opt
 // Internal symbols used to define all actions possibility
 extern void (*action[26])(struct printf_opt *opt, char n);
 
-#endif /*_SRC_STDIO_PRINTF_H__*/
+#endif /*_SRC_STDIO_INTERNAL_PRINTF_H__*/

@@ -1,5 +1,9 @@
 #include <stdio.h>
 
+// internal depency
+// TODO: update path detection
+#include "../src/stdio/internal/printf.h"
+
 static void disp_char(struct printf_opt *opt, char n)
 {
 	// Check write possibility

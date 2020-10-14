@@ -1,5 +1,9 @@
 #include <stdio.h>
 
+// internal depency
+// TODO: update path detection
+#include "../src/stdio/internal/printf.h"
+
 //TODO: precision handling
 int printf_common(struct printf_opt *opt, const char *restrict format)
 {

@@ -1,5 +1,9 @@
 #include <stdio.h>
 
+// internal depency
+// TODO: update path detection
+#include "../src/stdio/internal/printf.h"
+
 static int get_flags(struct printf_opt *opt, const char *restrict format)
 {
 	int i;

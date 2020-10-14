@@ -1,5 +1,9 @@
 #include <stdio.h>
 
+// internal depency
+// TODO: update path detection
+#include "../src/stdio/internal/printf.h"
+
 // Define all actions
 static void action_str(struct printf_opt *op, char n);
 static void action_ptr(struct printf_opt *op, char n);
@@ -25,7 +29,7 @@ void (*action[26])(struct printf_opt *opt, char n) = {
 static void base_to_str(struct printf_opt *opt, uint32_t num, int base, int digits)
 {
 	char *hexa = (opt->uppercase == 1) ? "0123456789ABCDEF" : "0123456789abcdef";
-	
+
 	opt->digits = 0;
 	while (num != 0 || opt->digits < digits)
 	{
@@ -131,7 +135,7 @@ static void action_ptr(struct printf_opt *opt, char n)
 	opt->sign = '@';
 	opt->base[0] = '0';
 	opt->base[1] = 'x';
-	base_to_str(opt, (uint32_t)va_arg(opt->ap, void*), 16, 8);
+	base_to_str(opt, (uintptr_t)va_arg(opt->ap, void*), 16, 8);
 	disp_format(opt);
 }
 
@@ -150,7 +154,7 @@ static void action_int(struct printf_opt *opt, char n)
 		opt->sign = (opt->flags.plus == 1) ? '+' : ' ';
 	}
 
-	// Generate / display number 
+	// Generate / display number
 	base_to_str(opt, num, 10, 1);
 	disp_format(opt);
 }
@@ -169,8 +173,7 @@ static void action_uint(struct printf_opt *opt, char n)
 	}
 
 	// Display extra symbols if needed
-	if (opt->flags.diez == 1)
-	{
+	if (opt->flags.diez == 1) {
 		if (n == 'o') {
 			opt->base[0] = '0';
 		} else if (n == 'x') {
