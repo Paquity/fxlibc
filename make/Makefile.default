@@ -34,8 +34,8 @@
 #---
 MAJOR	:= 0
 MINOR	:= 2
-PATCH	:= 4
-EXTRAVERSION	:= -beta
+PATCH	:= 5
+EXTRAVERSION	:= -rc
 
 
 #---
@@ -60,12 +60,6 @@ green	:= \033[1;32m
 blue	:= \033[1;34m
 white	:= \033[1;37m
 nocolor	:= \033[1;0m
-
-# This is a workaround to force a newline when the "eval" keyword is involved
-define n
-# Force newline character
-
-endef
 
 # Define all directory used to stored informations
 dir_object	:= object
@@ -114,7 +108,7 @@ first: all
 
 
 #---
-# Automated rules
+# Generate building rules
 #---
 # common part used to compile source file
 # @params:
@@ -206,13 +200,80 @@ all: $(generated-libs)
 version:
 	@ echo "$(lib-version)"
 
-DEBUG=$(call generate-target,fxlibc-vhex,static,$(dir_objects),$(src))
+
+#---
+# Generate installation rules
+#---
+# Common rules generated for the installation of each libraries.
+# Basically, it will generate <libname>-install and <libname>-uninstall rules
+# @note:
+# *1 - library pathname
+define generate-install-rule
+# generate the rulename
+# @note: basically, it is the library name
+lib-basename		:= $(notdir $1)
+
+# genetate rule name
+lib-install-rule	:= $$(basename $$(lib-basename))-install
+lib-uninstall-rule	:= $$(basename $$(lib-basename))-uninstall
+
+$$(lib-install-rule):
+	install -d $(CONFIG.PREFIX)
+	install $1 -m 644 $(CONFIG.PREFIX)
+
+$$(lib-uninstall-rule):
+	rm -f $(CONFIG.PREFIX)$$(lib-basename)
+
+
+# register generated rules into appropriate variable
+lib-installation-rules		+= $$(lib-install-rule)
+lib-uninstallation-rules	+= $$(lib-uninstall-rule)
+
+endef
+
+# internal variable used to store all rules about installation/uninstallation
+lib-installation-rules		:=
+lib-uninstallation-rules	:=
+
+# generate all installation/ unstallation rules
+$(foreach libs,$(generated-libs),$(eval \
+	$(call generate-install-rule,$(libs)) \
+))
+
+# Generate the include install directory.
+lib-install-header-dir	:= $(CONFIG.PREFIX)include/fxlibc
+
+
+
+
+#---
+# Installation rules
+#---
+install: $(generated-libs) $(lib-installation-rules)
+	rm -rf $(lib-install-header-dir)
+	cp -r ../include $(lib-install-header-dir)
+
+uninstall: $(lib-uninstallation-rules)
+	rm -rf $(lib-install-header-dir)
+
+
+
+
+#---
+# debug rule
+#---
+#DEBUG=$(call generate-target,fxlibc-vhex,static,$(dir_objects),$(src))
+DEBUG=$(call generate-install-rule,/output/static/fxlibc.a)
 export DEBUG
 debug:
 	@ echo "$$DEBUG"
 	@ echo "target-lib: $(target-libs)"
 	@ echo "generated lib: $(generated-libs)"
 	@ echo "target format: $(target-formats)"
+	@ echo "install-rules: $(lib-installation-rules)"
+	@ echo "uninstall-rules: $(lib-uninstallation-rules)"
+
+
 
 
 #---
