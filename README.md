@@ -80,7 +80,7 @@ please, try to respect these constraints:
 * One function per files.
 * Each file name content only the name of the function.
 * Respect the Linux Coding style as much as possible (if you are not familiar
-	with this norm, you can use `indent -linux` utilities to help to format).
+	with this norm, you can use `indent -linux` utility to help to format).
 * Header must respect the `/usr/include` architecture.
 * Avoid modules hardware-specific code which can generate interruptions
 	(DMA, SPU, ...) except if you are absolutely sure that the operating
@@ -91,6 +91,7 @@ please, try to respect these constraints:
 ### Using Fx C Library
 
 To use Fx C library as your runtime environment, the bare minimum is:
+
 * You must add `fxlibc/` instead of each include file (for example, if you want
 	to include `stdio.h` you mush use `#include <fxlibc/stdio.h>`.
 * Link with:
