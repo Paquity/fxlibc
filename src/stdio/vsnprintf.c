@@ -24,9 +24,11 @@ static void disp_fflush(struct printf_opt *opt)
 ** functions do not call the va_end macro. Because they invoke the va_arg macro,
 ** the value of ap is undefined after the call.
 */
-int vsnprintf(char *restrict str, size_t size, const char *restrict format, va_list ap)
+int vsnprintf(char *restrict str, size_t size, const char *restrict format,
+	      va_list ap)
 {
-	extern int printf_common(struct printf_opt *opt, const char *restrict format);
+	extern int printf_common(struct printf_opt *opt,
+				 const char *restrict format);
 	struct printf_opt opt;
 
 	opt.str = str;

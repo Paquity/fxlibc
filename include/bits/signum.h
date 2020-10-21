@@ -4,7 +4,7 @@
 // Define the number of signals
 #define NSIG		32
 
-// Vhex kernel internal define used to indicate 
+// Vhex kernel internal define used to indicate
 // if the signal is implemented or not
 #define __SIGUNDEF	((__sighandler_t) -2) /* Not implemented */
 

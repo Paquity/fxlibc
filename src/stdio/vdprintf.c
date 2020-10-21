@@ -34,7 +34,8 @@ static void disp_char(struct printf_opt *opt, char n)
 */
 int vdprintf(int fd, const char *restrict format, va_list ap)
 {
-	extern int printf_common(struct printf_opt *opt, const char *restrict format);
+	extern int printf_common(struct printf_opt *opt,
+				 const char *restrict format);
 	struct printf_opt opt;
 
 	opt.fd = fd;

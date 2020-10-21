@@ -24,11 +24,14 @@ void (*action[26])(struct printf_opt *opt, char n) = {
 
 
 //---
-//	Disp part
+//      Disp part
 //---
-static void base_to_str(struct printf_opt *opt, uint32_t num, int base, int digits)
+static void base_to_str(struct printf_opt *opt, uint32_t num, int base,
+			int digits)
 {
-	char *hexa = (opt->uppercase == 1) ? "0123456789ABCDEF" : "0123456789abcdef";
+	char *hexa = "0123456789abcdef";
+	if (opt->uppercase == 1)
+		hexa = "0123456789ABCDEF";
 
 	opt->digits = 0;
 	while (num != 0 || opt->digits < digits) {
@@ -53,7 +56,8 @@ static void disp_format(struct printf_opt *opt)
 			(opt->base[0] != '\0') + (opt->base[1] != '\0');
 		total = opt->width - total;
 		while (--total >= 0)
-			(*opt->disp_char)(opt, (opt->flags.zero == 1) ? '0' : ' ');
+			(*opt->disp_char)(opt,
+					(opt->flags.zero == 1) ? '0' : ' ');
 
 	}
 
@@ -74,18 +78,25 @@ static void disp_format(struct printf_opt *opt)
 
 
 //---
-//	Args part
+//      Args part
 //---
 static uint32_t get_arg_i(struct printf_opt *opt)
 {
 	switch (opt->lenght) {
-	case 0: return ((signed char)va_arg(opt->ap, int));
-	case 1: return ((short int)va_arg(opt->ap, int));
-	case 2: return (va_arg(opt->ap, long int));
-	case 3: return (va_arg(opt->ap, long long int));
-	case 4: return (va_arg(opt->ap, intmax_t));
-	case 5: return (va_arg(opt->ap, size_t));
-	case 6: return (va_arg(opt->ap, ptrdiff_t));
+	case 0:
+		return ((signed char)va_arg(opt->ap, int));
+	case 1:
+		return ((short int)va_arg(opt->ap, int));
+	case 2:
+		return (va_arg(opt->ap, long int));
+	case 3:
+		return (va_arg(opt->ap, long long int));
+	case 4:
+		return (va_arg(opt->ap, intmax_t));
+	case 5:
+		return (va_arg(opt->ap, size_t));
+	case 6:
+		return (va_arg(opt->ap, ptrdiff_t));
 	}
 	return (va_arg(opt->ap, int));
 }
@@ -93,20 +104,27 @@ static uint32_t get_arg_i(struct printf_opt *opt)
 static uint32_t get_arg_u(struct printf_opt *opt)
 {
 	switch (opt->lenght) {
-	case 0: return ((unsigned char)va_arg(opt->ap, int));
-	case 1: return ((unsigned short int)va_arg(opt->ap, int));
-	case 2: return (va_arg(opt->ap, unsigned long int));
-	case 3: return (va_arg(opt->ap, unsigned long long int));
-	case 4: return (va_arg(opt->ap, intmax_t));
-	case 5: return (va_arg(opt->ap, size_t));
-	case 6: return (va_arg(opt->ap, ptrdiff_t));
+	case 0:
+		return ((unsigned char)va_arg(opt->ap, int));
+	case 1:
+		return ((unsigned short int)va_arg(opt->ap, int));
+	case 2:
+		return (va_arg(opt->ap, unsigned long int));
+	case 3:
+		return (va_arg(opt->ap, unsigned long long int));
+	case 4:
+		return (va_arg(opt->ap, intmax_t));
+	case 5:
+		return (va_arg(opt->ap, size_t));
+	case 6:
+		return (va_arg(opt->ap, ptrdiff_t));
 	}
 	return (va_arg(opt->ap, unsigned int));
 }
 
 
 //---
-//	Actions part.
+//      Actions part.
 //---
 static void action_str(struct printf_opt *opt, char n)
 {
@@ -161,9 +179,15 @@ static void action_uint(struct printf_opt *opt, char n)
 
 	// Get appropriate base
 	switch (n) {
-	case 'o': base = 8; break;
-	case 'x': base = 16; break;
-	default:  base = 10; break;
+	case 'o':
+		base = 8;
+		break;
+	case 'x':
+		base = 16;
+		break;
+	default:
+		base = 10;
+		break;
 	}
 
 	// Display extra symbols if needed
@@ -171,7 +195,7 @@ static void action_uint(struct printf_opt *opt, char n)
 		if (n == 'o') {
 			opt->base[0] = '0';
 		} else if (n == 'x') {
-			opt->base[0] =  '0';
+			opt->base[0] = '0';
 			opt->base[1] = (opt->uppercase == 1) ? 'X' : 'x';
 		}
 	}

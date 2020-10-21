@@ -9,21 +9,30 @@ static int get_flags(struct printf_opt *opt, const char *restrict format)
 	int i;
 
 	i = -1;
-	opt->flags.diez  = 0;
-	opt->flags.zero  = 0;
+	opt->flags.diez = 0;
+	opt->flags.zero = 0;
 	opt->flags.minus = 0;
 	opt->flags.space = 0;
-	opt->flags.plus  = 0;
-	while (format[++i] != '\0')
-	{
-		switch (format[i])
-		{
-		case '#': opt->flags.diez  = 1; break;
-		case '0': opt->flags.zero  = 1; break;
-		case '-': opt->flags.minus = 1; break;
-		case ' ': opt->flags.space = 1; break;
-		case '+': opt->flags.plus  = 1; break;
-		default: return (i);
+	opt->flags.plus = 0;
+	while (format[++i] != '\0') {
+		switch (format[i]) {
+		case '#':
+			opt->flags.diez = 1;
+			break;
+		case '0':
+			opt->flags.zero = 1;
+			break;
+		case '-':
+			opt->flags.minus = 1;
+			break;
+		case ' ':
+			opt->flags.space = 1;
+			break;
+		case '+':
+			opt->flags.plus = 1;
+			break;
+		default:
+			return (i);
 		}
 	}
 	return (i);
@@ -46,7 +55,7 @@ static int get_width(struct printf_opt *opt, const char *restrict format)
 	// Get static width
 	while (format[++i] >= '0' && format[i] <= '9')
 		opt->width = (opt->width * 10) + (format[i] - '0');
-	return (i); 
+	return (i);
 }
 
 static int get_precision(struct printf_opt *opt, const char *restrict format)
@@ -70,20 +79,30 @@ static int get_precision(struct printf_opt *opt, const char *restrict format)
 	// Check default precision
 	if (i == 0)
 		opt->precision = 1;
-	return (i); 
+	return (i);
 }
 
 static int get_lenght(struct printf_opt *opt, const char *restrict format)
 {
 	opt->lenght = -1;
-	switch (format[0])
-	{
-	case 'h': opt->lenght = (format[1] == 'h') ? 1 : 0; break;
-	case 'l': opt->lenght = (format[1] == 'l') ? 3 : 2; break;
-	case 'j': opt->lenght = 4; break;
-	case 'z': opt->lenght = 5; break;
-	case 't': opt->lenght = 6; break;
-	default: return (0);
+	switch (format[0]) {
+	case 'h':
+		opt->lenght = (format[1] == 'h') ? 1 : 0;
+		break;
+	case 'l':
+		opt->lenght = (format[1] == 'l') ? 3 : 2;
+		break;
+	case 'j':
+		opt->lenght = 4;
+		break;
+	case 'z':
+		opt->lenght = 5;
+		break;
+	case 't':
+		opt->lenght = 6;
+		break;
+	default:
+		return (0);
 	}
 	return ((opt->lenght == 1 || opt->lenght == 3) ? 2 : 1);
 }
@@ -98,7 +117,7 @@ int printf_get_options(struct printf_opt *opt, const char *restrict format)
 	opt->base[1] = '\0';
 
 	// Get generals opetions
-	i  = get_flags(opt, &format[0]);
+	i = get_flags(opt, &format[0]);
 	i += get_width(opt, &format[i]);
 	i += get_precision(opt, &format[i]);
 	i += get_lenght(opt, &format[i]);

@@ -1,5 +1,5 @@
 #ifndef _SRC_STDIO_INTERNAL_PRINTF_H__
-# define _SRC_STDIO_INTERNAL_PRINTF_H__
+#define _SRC_STDIO_INTERNAL_PRINTF_H__
 
 #include <stddef.h>
 #include <stdint.h>

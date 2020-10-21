@@ -20,7 +20,7 @@ char *strcat(char *dest, char const *src)
 		return (0);
 	i = -1;
 	start = -1;
-	while (dest[++start] != '\0');
+	while (dest[++start] != '\0') ;
 	while (src[++i] != '\0')
 		dest[start + i] = src[i];
 	dest[i + start] = '\0';
@@ -43,7 +43,7 @@ char *strncat(char *dest, const char *src, size_t n)
 	size_t dest_len = strlen(dest);
 	size_t i;
 
-	for (i = 0 ; i < n && src[i] != '\0' ; i++)
+	for (i = 0; i < n && src[i] != '\0'; i++)
 		dest[dest_len + i] = src[i];
 	dest[dest_len + i] = '\0';
 	return (dest);
