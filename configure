@@ -1,9 +1,5 @@
 #! /bin/bash
-#
-# -= TODO =-
-# * check if the wanted lib exist (check lib verion too)!
-# * option to list all installed libraries with their versions
-# * each ABI options define one specific libs (fxlibc-common, fxlibc-vhex, fxlibc-fx9860g, fxlibc-fxcg50)
+# Fx C standard library configuration script
 
 # output file
 confile='fxlibc.cfg'
@@ -18,7 +14,6 @@ makefile='Makefile.default'
 
 # configuration
 debug=false
-valgrind=false
 
 # ABI support
 support_vhex_kernel=false
@@ -52,20 +47,24 @@ Build options:
   --prefix=PREFIX      Install prefix (PREFIX/lib and PREFIX/include are used)
 
 ABI support:
-  --support-vhex
-    Enable the Vhex kernel support
-  --support-casio-fx9860,
-  --support-casio-fxcg50
-    Enable the support of the Casio' ABI (used by malloc, free, ...)
+  --support=<target>,<target>, ...
+    Support all <target> ABI if supported by the library.
 
-    fx9860 covers all fx-9860G II-like monochromes models that support add-ins
-    or can be flashed with an OS that does. This includes SH3 and SH4 machines.
+    target-list:
+    * vhex
+        Enable the Vhex kernel support
+    * fx9860g, fxcg50
+        Enable the support of the Casio' ABI
 
-    fxcg50 covers just the fx-CG 50; there is some unofficial compatibility with
-    fx-CG 10/20. All of these are SH4-only.
+        fx9860 covers all fx-9860G II-like monochromes models that support
+	addins or can be flashed with an OS that does. This includes SH3 and
+	SH4 machines.
 
-The 'ABI support' is used to allow some part of the code, in particular the 'unistd'
-part, I/O management and additionals feature. (like process, fs, ...).
+        fxcg50 covers just the fx-CG 50; there is some unofficial compatibility
+	with fx-CG 10/20. All of these are SH4-only.
+
+The 'ABI support' is used to allow some part of the code, in particular the
+'unistd' part, I/O management and additionals feature. (like process, fs, ...).
 
 Format:
     --static    Generate static libraries (default)
@@ -88,6 +87,13 @@ To do this we need to do several steps:
 EOF
   exit 0
 }
+
+#---
+# Check early help options
+#---
+if [[ $# -lt 1 ]] || [[ "$1" = "-h" ]] || [[ "$1" = "--help" ]]; then
+	help
+fi
 
 
 #---
@@ -125,12 +131,23 @@ for arg; do case "$arg" in
     cflags=${arg#*=};;
 
   # ABI support
-  --support-vhex)
-    support_vhex_kernel=true;;
-  --support-casio-abi-fx9860)
-    support_casio_abi_fx9860=true;;
-  --support-casio-abi-fxcg50)
-    support_casio_abi_fxcg50=true;;
+  --support=*)
+    IFS=',' read -ra target_abi <<< "${arg#*=}"
+    for abi in "${target_abi[@]}"; do case "$abi" in
+      all)
+        support_vhex_kernel=true
+        support_casio_abi_fx9860=true
+        support_casio_abi_fxcg50=true;;
+      vhex)
+        support_vhex_kernel=true;;
+      fx9860g)
+        support_casio_abi_fx9860=true;;
+      fxcg50)
+        support_casio_abi_fxcg50=true;;
+      *)
+        echo "error: unreconized target '$abi', giving up." >&2
+        exit 1
+    esac; done;;
 
   # format options
   --static)
@@ -168,10 +185,10 @@ then
   prefix=$inst
 fi
 
-
 # TODO
 # TODO: check if the wanted lib exist (check lib verion too)!
 # TODO
+
 
 #---
 # Dump appropriate Makefile

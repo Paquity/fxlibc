@@ -14,7 +14,7 @@ system.
 
 ## Dependencies
 Fx C library depends on a suitable GCC toolchain in the PATH. You can absolutely
-not build gint with your system compiler!
+not build `fxlibc` with your system compiler!
 
 * The tutorial on Planète Casio builds an sh-elf that works everywhere.
 * For fx-9860G II, `sh3eb-elf` is strongly advised.
@@ -35,14 +35,14 @@ the wiki)
 
 #### Configuration and support
 The Fx C library supports these ABI:
-* `casio-abi-fx9860g` for the support of Casio ABI used by fx9860g-like devices.
-* `casio-abi-fxcg50` for the support of Casio ABI used by the fxcg50 device.
-* `vhex-kernel` for the support of Vhex kernel ABI.
+* `fx9860g` for the support of Casio ABI used by fx9860g-like devices.
+* `fxcg50` for the support of Casio ABI used by the fxcg50 device.
+* `vhex` for the support of Vhex kernel ABI.
 * (nothing) compile only standing functions.
 
 The Fx C library support these format:
 * `static` generate static libraries.
-* `shared` generate shared libraries (Only for the Vhex kernel).
+* `dynamic` generate dynamic libraries (Only for the Vhex kernel).
 
 Note that the shared feature  is not currently implemented because of
 non-support of the shared library generation by the GCC compiler for SuperH
@@ -50,13 +50,13 @@ architecture. A workaround can be used  but it requires a static library to do
 the dynamic symbols resolving (Thanks Kristaba).
 
 For more information about library build configuration, you can use the
-`../configure --help` command.
+`./configure --help` command.
 
 #### Building
 Create a build directory and configure in it:
 ```
 % mkdir build && cd build
-% ../configure
+% ../configure --static --support=vhex,fx9860g,fxcg50
 ```
 
 Then build the source and install the library files to the selected directory.
@@ -95,10 +95,10 @@ To use Fx C library as your runtime environment, the bare minimum is:
 * You must add `fxlibc/` instead of each include file (for example, if you want
 	to include `stdio.h` you mush use `#include <fxlibc/stdio.h>`.
 * Link with:
-	* `-lfxlibc` for standalone feature
-	* `-lfxlibc-casio-abi-fx9860g` for Casio ABI support for monochrome devices
-	* `-lfxlibc-casio-abi-fxcg50` for Casio ABI support for primz devices
+	* `-lfxlibc-fx9860g` for Casio ABI support for monochrome devices
+	* `-lfxlibc-fxcg50` for Casio ABI support for primz devices
 	* `-lfxlibc-vhex` for Vhex kernel support.
+	* `-lfxlibc` for standalone features
 
 ---
 
@@ -106,3 +106,9 @@ To use Fx C library as your runtime environment, the bare minimum is:
 This work is licensed under a CC0 1.0 Universal License. To view a copy of this
 license, visit: https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt
 Or see the LICENSE file.
+
+---
+
+### Special thanks to
+* Lephenixnoir - For all <3
+* Kristaba - For the idea with the shared libraries workaround !
