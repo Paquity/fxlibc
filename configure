@@ -201,7 +201,7 @@ if ! test $src; then
   echo "error: target makefile ($src) does not exist !" >&2
   exit 1
 fi
-[ $dst ] && [ "$(readlink $dst)" == $src ] && rm $dst
+[ -e "$dst" ] && [ "$(readlink $dst)" = "$src" ] && rm $dst
 ln -s $src $dst
 
 
