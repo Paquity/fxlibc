@@ -91,8 +91,8 @@ EOF
 #---
 # Check early help options
 #---
-if [[ $# -lt 1 ]] || [[ "$1" = "-h" ]] || [[ "$1" = "--help" ]]; then
-	help
+if [[ $# -eq 1 ]] || [[ "$1" = "-h" ]] || [[ "$1" = "--help" ]]; then
+  help
 fi
 
 
@@ -113,6 +113,7 @@ fi
 # Parsing arguments
 #---
 for arg; do case "$arg" in
+  # Help options
   --help | -h)
     help;;
 
@@ -197,7 +198,7 @@ fi
 #---
 dst='Makefile'
 src="../make/$makefile"
-if ! test $src; then
+if ! [ -e $src ] ; then
   echo "error: target makefile ($src) does not exist !" >&2
   exit 1
 fi
