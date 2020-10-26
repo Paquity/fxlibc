@@ -35,7 +35,7 @@
 #---
 MAJOR	:= 0
 MINOR	:= 3
-PATCH	:= 3
+PATCH	:= 4
 EXTRAVERSION	:=
 
 
@@ -52,7 +52,7 @@ include $(CONFIG)
 
 # Compiler flags, assembler flags, dependency generation, archiving
 header	:= ../include
-cflags	:= $(machine) -ffreestanding -nostdlib -Wall -Wextra -std=c11 -Os \
+cflags	:= -ffreestanding -nostdlib -Wall -Wextra -std=c11 -Os \
 		-fstrict-volatile-bitfields -I$(header) $(CONFIG.CFLAGS)
 
 # color definition
