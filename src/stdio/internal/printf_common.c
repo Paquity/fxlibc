@@ -20,8 +20,8 @@ int printf_common(struct printf_opt *opt, const char *restrict format)
 		// Check printable char
 		if (format[p] != '%' || format[p + 1] == '%') {
 			tmp = format[p];
-			if (format[p] != '%')
-				tmp = format[++p];
+			if (format[p] == '%')
+				p = p + 1;
 			(*opt->disp_char)(opt,tmp);
 			continue;
 		}

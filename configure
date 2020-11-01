@@ -211,22 +211,23 @@ ln -s $src $dst
 #---
 generate_config()
 {
-  echo 'CONFIG.CFLAGS := '
-  echo 'CONFIG.TARGET := '
-  echo 'CONFIG.FORMAT := '
+  # build information
   echo "CONFIG.TOOLCHAIN := $toolchain"
   [ "$prefix" ] && echo "CONFIG.PREFIX := $prefix"
-  [ "$cflags" ] && echo "CONFIG.CFLAGS += $cflags"
 
-  # debug / unit tests
+  # extra flags
+  echo 'CONFIG.CFLAGS := '
+  [ "$cflags" ] && echo "CONFIG.CFLAGS += $cflags"
   [ $debug = true ] && echo 'CONFIG.CFLAGS += -g3'
 
   # ABI support
+  echo 'CONFIG.TARGET := fxlibc'
   [ $support_vhex_kernel = true ] && echo 'CONFIG.TARGET += fxlibc-vhex'
   [ $support_casio_abi_fx9860 = true ] && echo 'CONFIG.TARGET += fxlibc-fx9860g'
   [ $support_casio_abi_fxcg50 = true ] && echo 'CONFIG.TARGET += fxlibc-fxcg50'
 
   # formats
+  echo 'CONFIG.FORMAT := '
   [ $format_static = true ] && echo 'CONFIG.FORMAT += static'
   [ $format_dynamic = true ] && echo 'CONFIG.FORMAT += dynamic'
 }

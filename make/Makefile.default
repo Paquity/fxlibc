@@ -35,7 +35,7 @@
 #---
 MAJOR	:= 0
 MINOR	:= 3
-PATCH	:= 4
+PATCH	:= 5
 EXTRAVERSION	:=
 
 
@@ -210,25 +210,18 @@ version:
 # @note:
 # *1 - library pathname
 define generate-install-rule
-# get the library name (remove path information)
-lib-basename		:= $(notdir $1)
-
-# Genetate rules name
-lib-install-rule	:= $$(basename $$(lib-basename))-install
-lib-uninstall-rule	:= $$(basename $$(lib-basename))-uninstall
-
 # Generate the installation rule
-$$(lib-install-rule):
+$(basename $(notdir $1))-install:
 	install -d $(CONFIG.PREFIX)
 	install $1 -m 644 $(CONFIG.PREFIX)
 
 # Generate the uninstallation rule
-$$(lib-uninstall-rule):
-	rm -f $(CONFIG.PREFIX)$$(lib-basename)
+$(basename $(notdir $1))-uninstall:
+	rm -f $(CONFIG.PREFIX)$(notdir $1)
 
 # Register generated rules into their appropriate list
-lib-installation-rules		+= $$(lib-install-rule)
-lib-uninstallation-rules	+= $$(lib-uninstall-rule)
+lib-installation-rules		+= $(basename $(notdir $1))-install
+lib-uninstallation-rules	+= $(basename $(notdir $1))-uninstall
 
 endef
 
