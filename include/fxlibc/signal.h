@@ -3,7 +3,8 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <bits/signum.h>
+
+#include <fxlibc/bits/signum.h>
 
 /* Type of signal set */
 typedef uint32_t sigset_t;

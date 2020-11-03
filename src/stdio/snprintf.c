@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <fxlibc/stdio.h>
 
 /*
 ** sprintf(),  snprintf(), vsprintf() and vsnprintf() write the output under the

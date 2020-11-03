@@ -1,7 +1,7 @@
-#include <stdio.h>
-#include <unistd.h>
+#include <fxlibc/stdio.h>
+#include <fxlibc/unistd.h>
 
-int putc(int c)
+int putchar(int c)
 {
 	char n;
 

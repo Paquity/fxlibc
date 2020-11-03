@@ -35,7 +35,7 @@
 #---
 MAJOR	:= 0
 MINOR	:= 3
-PATCH	:= 5
+PATCH	:= 6
 EXTRAVERSION	:=
 
 
@@ -140,9 +140,9 @@ endif
 # add custom project-specific flags based on the target ABI
 ifeq ($1,fxlibc-vhex)
 lib-cflags	+= -D __SUPPORT_VHEX_KERNEL
-else ifeq ($1,fxlibc-casio-abi-fx9860g)
+else ifeq ($1,fxlibc-fx9860g)
 lib-cflags	+= -D __SUPPORT_CASIO_ABI_FX9860G
-else ifeq ($1,fxlibc-casio-abi-fxcf50)
+else ifeq ($1,fxlibc-fxcf50)
 lib-cflags	+= -D __SUPPORT_CASIO_ABI_FXCG50
 endif
 
@@ -235,7 +235,11 @@ $(foreach libs,$(lib-generation-rules),$(eval \
 ))
 
 # Generate the path where include directory will be installed.
-lib-install-header-dir	:= $(CONFIG.PREFIX)include/fxlibc
+lib-install-header-dir	:= $(CONFIG.PREFIX)include/
+ifeq ($(wildcard $(lib-install-header-dir)fxlibc/.*),)
+	lib-install-header-dir	:= $(lib-install-header-dir)fxlibc
+endif
+
 
 
 
@@ -244,11 +248,10 @@ lib-install-header-dir	:= $(CONFIG.PREFIX)include/fxlibc
 # Installation rules
 #---
 install: $(lib-generation-rules) $(lib-installation-rules)
-	rm -rf $(lib-install-header-dir)
-	cp -r ../include $(lib-install-header-dir)
+	cp -r ../include/fxlibc/ $(lib-install-header-dir)
 
 uninstall: $(lib-uninstallation-rules)
-	rm -rf $(lib-install-header-dir)
+	rm -rf $(CONFIG.PREFIX)include/fxlibc
 
 
 

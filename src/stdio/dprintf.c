@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <fxlibc/stdio.h>
 
 /*
 ** The function dprintf() is the same as fprintf() except that it outputs to a

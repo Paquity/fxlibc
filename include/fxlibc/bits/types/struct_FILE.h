@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include <sys/types.h>
+
+#include <fxlibc/sys/types.h>
 
 //---
 // TODO: VFS abstraction ? or ABI-spesific abstraction ?

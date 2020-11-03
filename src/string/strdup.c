@@ -1,5 +1,5 @@
-#include <string.h>
-#include <stdlib.h>
+#include <fxlibc/string.h>
+#include <fxlibc/stdlib.h>
 
 /*
 ** The  strdup()  function  returns a pointer to a new string which is a

@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 /* Get '__jmp_buf' */
-#include <bits/setjmp.h>
+#include <fxlibc/bits/setjmp.h>
 
 /* User jmp_buf alias */
 typedef struct __jmp_buf jmp_buf[1];

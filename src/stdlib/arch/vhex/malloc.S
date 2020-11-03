@@ -1,5 +1,5 @@
 #ifdef __SUPPORT_VHEX_KERNEL
-#include <asm/unistd_32.h>
+#include <fxlibc/asm/unistd_32.h>
 .text
 .global	_malloc
 .type	_malloc, @function

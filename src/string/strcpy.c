@@ -1,4 +1,4 @@
-#include <string.h>
+#include <fxlibc/string.h>
 
 /*
 ** The  strcpy() function copies the string pointed to by src, including the

@@ -1,4 +1,4 @@
-#include <string.h>
+#include <fxlibc/string.h>
 
 /*
 ** The strchr() function returns a pointer to the first occurrence of the

@@ -1,6 +1,6 @@
 #ifdef __SUPPORT_CASIO_ABI_FX9860G
-#include <asm/unistd_32.h>
-#include <asm-casio/__trapa.h>
+#include <fxlibc/asm/unistd_32.h>
+#include <fxlibc/asm-casio/__trapa.h>
 .text
 .global	_close
 .type	_close, @function

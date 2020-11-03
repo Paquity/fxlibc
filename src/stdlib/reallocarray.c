@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <fxlibc/stdlib.h>
 
 /*
 ** The reallocarray() function changes the size of the memory block pointed to

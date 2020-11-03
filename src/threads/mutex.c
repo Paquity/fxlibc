@@ -1,5 +1,5 @@
-#include <threads.h>
-#include <unistd.h>
+#include <fxlibc/threads.h>
+#include <fxlibc/unistd.h>
 
 // Creates a new mutex object with type __TYPE.
 // @note: If successful the new object is pointed by __MUTEX.

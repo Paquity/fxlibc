@@ -1,4 +1,4 @@
-#include <string.h>
+#include <fxlibc/string.h>
 
 /*
 ** The  memset()  function fills the first n bytes of the memory area pointed to

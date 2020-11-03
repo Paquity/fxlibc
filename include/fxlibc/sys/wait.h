@@ -9,10 +9,10 @@
 ** This will define the `W*' macros for the flag bits to `waitpid', `wait3',
 ** and `wait4'.
 */
-#include <bits/waitflags.h>
+#include <fxlibc/bits/waitflags.h>
 
 /* This will define all the `__W*' macros.*/
-#include <bits/waitstatus.h>
+#include <fxlibc/bits/waitstatus.h>
 
 /* Macros for the `waitpid`'s wstatus argument. */
 #define WEXITSTATUS(status)	__WEXITSTATUS(status)

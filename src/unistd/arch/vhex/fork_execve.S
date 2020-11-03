@@ -1,5 +1,5 @@
 #ifdef __SUPPORT_VHEX_KERNEL
-#include <asm/unistd_32.h>
+#include <fxlibc/asm/unistd.h>
 .text
 .global	_fork_execve
 .type	_fork_execve, @function

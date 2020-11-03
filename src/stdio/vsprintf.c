@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <fxlibc/stdio.h>
 
 /*
 ** The functions vsprintf() are equivalent to the sprintf() except that  they

@@ -1,6 +1,6 @@
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <fxlibc/stdlib.h>
+#include <fxlibc/string.h>
+#include <fxlibc/unistd.h>
 
 /*
 ** The calloc() function allocates memory for an array of nmemb elements of size

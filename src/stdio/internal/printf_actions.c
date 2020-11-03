@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <fxlibc/stdio.h>
 
 // internal depency
 // TODO: update path detection

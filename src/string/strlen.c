@@ -1,4 +1,4 @@
-#include <string.h>
+#include <fxlibc/string.h>
 
 /*
 ** The  strlen() function calculates the length of the string pointed to by s,

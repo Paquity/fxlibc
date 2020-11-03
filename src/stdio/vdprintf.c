@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <unistd.h>
+#include <fxlibc/stdio.h>
+#include <fxlibc/unistd.h>
 
 // internal depency
 // TODO: update path detection

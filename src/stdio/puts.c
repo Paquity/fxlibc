@@ -1,6 +1,6 @@
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+#include <fxlibc/stdio.h>
+#include <fxlibc/string.h>
+#include <fxlibc/unistd.h>
 
 /*
 ** puts() writes the string s and a trailing newline to stdout.

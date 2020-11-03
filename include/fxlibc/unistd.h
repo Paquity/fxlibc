@@ -3,7 +3,8 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <sys/types.h>
+
+#include <fxlibc/sys/types.h>
 
 //---
 // Process part
@@ -86,7 +87,7 @@ extern int close(int __fd);
 ** the `_SC_*' symbols for the NAME argument to `sysconf'; and the `_CS_*'
 ** symbols for the NAME argument to `confstr'.
 */
-#include <bits/confname.h>
+#include <fxlibc/bits/confname.h>
 
 /* Get the value of the system variable NAME. */
 extern long int sysconf(int __name);

@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <unistd.h>
+#include <fxlibc/stdio.h>
+#include <fxlibc/unistd.h>
 
 /*
 ** printf() write the output under the control of a format string that specifies

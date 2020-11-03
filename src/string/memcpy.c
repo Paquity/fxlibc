@@ -1,4 +1,4 @@
-#include <string.h>
+#include <fxlibc/string.h>
 
 /*
 ** The memcpy() function copies n bytes from memory area src to memory area dest.

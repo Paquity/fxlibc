@@ -1,4 +1,4 @@
-#include <string.h>
+#include <fxlibc/string.h>
 
 /*
 ** The strcmp() function compares the two strings s1 and s2. The locale is not
