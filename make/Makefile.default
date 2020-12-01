@@ -9,10 +9,11 @@
 # Build architecture:
 # build/
 #  |-- objects/
-#  |    |-- string_strlen.o
-#  |    |-- string_strcmp.o
-#  |      ...
-#  |    `-- signal_kill.o
+#  |    ` <format>/
+#  |       |-- string_strlen.o
+#  |       |-- string_strcmp.o
+#  |         ...
+#  |       `-- signal_kill.o
 #  |-- debug/
 #  |    |-- fxlibc.map (ELF link map informations)
 #  |      ...
@@ -20,14 +21,11 @@
 #  |-- Makefile
 #  |-- fxlibc.cfg
 #  `-- ouptut/
-#       |-- static/
-#       |    |--- libfxlibc.a
-#       |    |--- libfxlibc-casio-abi-fx9860.a
-#       |    `--- libfxlibc-casio-abi-fxcg50.a
-#       `--- dynamic/
-#            |--- libfxlibc.so
-#            |--- libfxlibc-casio-abi-fx9860.so
-#            `--- libfxlibc-casio-abi-fxcg50.so
+#       ` <format>/
+#            |--- libfxlibc.[a/so]
+#            |--- libfxlibc-vhex.[a/so]
+#            |--- libfxlibc-fx9860.a]
+#            `--- libfxlibc-fxcg50.[a/so]
 #
 # TODO:
 # * handle dynamic versioning
@@ -35,7 +33,7 @@
 #---
 MAJOR	:= 0
 MINOR	:= 3
-PATCH	:= 6
+PATCH	:= 7
 EXTRAVERSION	:=
 
 
@@ -84,23 +82,12 @@ ar	= $(CONFIG.TOOLCHAIN)-ar
 objcopy	= $(CONFIG.TOOLCHAIN)-objcopy
 
 
-
-
 #---
 # Build rules
 #---
-# (Make selects the first rule when you type "make" and I don't want the first
-# rule to be "%/" so here's a placeholder)
+# (Make selects the first rule when you type "make" and the first rule
+# will be generated "randomly" so here's a placeholder)
 first: all
-
-# Create directory helper
-# @note: Just use "$*" and "$@" to refer to the directory being created.
-%/:
-	@ printf "Create $(blue)$*$(nocolor) directory\n"
-	@ mkdir -p $@
-.PRECIOUS: %/
-
-
 
 
 #---
@@ -114,7 +101,8 @@ first: all
 # TODO:
 # * handle verbose option
 define generate-compilation-rule
-$(patsubst .._src_%,$2%.o,$(subst /,_,$(basename $1))): $1 | $2/
+$(patsubst .._src_%,$2%.o,$(subst /,_,$(basename $1))): $1
+	@ mkdir -p $$(dir $$@)
 	@ printf "$(green)>$(nocolor) $(white)$$@$(nocolor)\n"
 	@ $(gcc) $3 -o $$@ -c $$< -lgcc
 endef
@@ -148,7 +136,8 @@ endif
 
 # Generate all file compilation rules
 $$(foreach source,$3,$$(eval \
-	$$(call generate-compilation-rule,$$(source),$$(lib-build-dir),$$(lib-cflags)) \
+	$$(call generate-compilation-rule,\
+		$$(source),$$(lib-build-dir),$$(lib-cflags)) \
 ))
 
 # Register the library building rule name
@@ -161,7 +150,9 @@ lib-generation-rules += $$(lib-name)
 # Generate the linking library rule
 # TODO
 # * Find better way to generate binary files name dependency
-$$(lib-name): $$(patsubst .._src_%,$$(lib-build-dir)%.o,$$(subst /,_,$$(basename $3))) | $$(lib-output-dir)
+$$(lib-name): $$(patsubst .._src_%,$$(lib-build-dir)%.o,\
+						$$(subst /,_,$$(basename $3)))
+	@ mkdir -p $$(dir $$@)
 ifeq ($2,dynamic)
 	$(gcc) -shared -Wl,-soname=$$@ -o $$@ $$^ -nostdlib -lgcc
 else
@@ -210,10 +201,16 @@ version:
 # @note:
 # *1 - library pathname
 define generate-install-rule
+# Disable -m on Mac OS
+m644 := -m 644
+ifeq "$(shell uname)" "Darwin"
+m644 :=
+endif
+
 # Generate the installation rule
 $(basename $(notdir $1))-install:
 	install -d $(CONFIG.PREFIX)
-	install $1 -m 644 $(CONFIG.PREFIX)
+	install $1 $(m644) $(CONFIG.PREFIX)
 
 # Generate the uninstallation rule
 $(basename $(notdir $1))-uninstall:
@@ -259,8 +256,10 @@ uninstall: $(lib-uninstallation-rules)
 #---
 # (internal ) debug rule
 #---
+DEBUG=$(call generate-compilation-rule,../src/unistd/arch/vhex/close.c,\
+							object/static/,-Werror)
 #DEBUG=$(call generate-target,fxlibc-vhex,static,$(dir_objects),$(src))
-DEBUG=$(call generate-install-rule,/output/static/fxlibc.a)
+#DEBUG=$(call generate-install-rule,/output/static/fxlibc.a)
 export DEBUG
 debug:
 	@ echo "$$DEBUG"
